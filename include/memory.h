@@ -2,20 +2,31 @@
 #define MEMORY_H
 
 #include <cstdint>
-#include <array>
+#include <vector>
+#include <stdexcept>
 
 class Memory {
 public:
-    Memory(uint16_t size = 256);  // Default 256 bytes
-    uint8_t read_byte(uint16_t addr);
-    uint16_t read_word(uint16_t addr);  // Little-endian
-    void write_byte(uint16_t addr, uint8_t val);
-    void write_word(uint16_t addr, uint16_t val);
-    void load_program(uint16_t start_addr, const std::array<uint8_t, 256>& program);
+    static const uint32_t SIZE = 64 * 1024; // 64KB
+
+    Memory();
+    ~Memory();
+
+    // Load data into memory at address
+    void load(uint32_t addr, const uint8_t* data, size_t size);
+
+    // Read/Write bytes, words (16-bit), dwords (32-bit) - little-endian
+    uint8_t read_byte(uint32_t addr) const;
+    uint16_t read_word(uint32_t addr) const;
+    uint32_t read_dword(uint32_t addr) const;
+
+    void write_byte(uint32_t addr, uint8_t val);
+    void write_word(uint32_t addr, uint16_t val);
+    void write_dword(uint32_t addr, uint32_t val);
 
 private:
-    std::array<uint8_t, 256> ram;
-    uint16_t mem_size;
+    std::vector<uint8_t> mem;
+    void check_bounds(uint32_t addr, size_t size) const;
 };
 
 #endif // MEMORY_H

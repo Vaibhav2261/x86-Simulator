@@ -1,53 +1,31 @@
 #include <iostream>
 #include <iomanip>
-#include <array>
 #include "simulator.h"
-#include "memory.h"
 
 int main() {
-    Memory mem(256);
-    CPU cpu(mem);
+    Simulator sim;
 
-    // Hardcoded test program (x86-like bytes, little-endian)
-    // Program: MOV AX, 0x00; MOV BX, 0x05; MOV CX, 0x03; ADD AX, BX; ADD AX, CX; MOV [0x10], AX; JMP +5 (loop-ish); NOP; HALT (simplified)
-    std::array<uint8_t, 20> program = {
-        0xB8, 0x00,  // MOV AX, imm 0x00 (simplified imm encoding)
-        0xBB, 0x05,  // MOV BX, imm 0x05
-        0xB9, 0x03,  // MOV CX, imm 0x03
-        0x01, 0xC8,  // ADD AX, BX (0x01 = ADD, modrm=0xC8 for AX+BX)
-        0x01, 0xC1,  // ADD AX, CX (modrm=0xC1 for AX+CX)
-        0xA2, 0x10, 0x00,  // MOV [0x0010], AL (simplified)
-        0xEB, 0x05,  // JMP +5 (relative)
-        0x90,        // NOP
-        0x90,        // NOP (padding)
-        0xF4         // HALT (simplified, not executed)
+    // Hardcoded program: MOV EAX, 5; MOV EBX, 3; ADD EAX, EBX; HLT
+    // Bytes (little-endian):
+    // MOV EAX,5: B8 05 00 00 00
+    // MOV EBX,3: BB 03 00 00 00
+    // ADD EAX,EBX: 01 D8 (01 /r ADD r32, r/m32; here EBX to EAX)
+    // HLT: F4
+    uint8_t program[] = {
+        0xB8, 0x05, 0x00, 0x00, 0x00,  // MOV EAX, 5
+        0xBB, 0x03, 0x00, 0x00, 0x00,  // MOV EBX, 3
+        0x01, 0xD8,                     // ADD EAX, EBX
+        0xF4                            // HLT
     };
-    mem.load_program(0x0000, program);
+    sim.memory.load(0x1000, program, sizeof(program));  // Load at address 0x1000
+    sim.set_eip(0x1000);
 
-    std::cout << "Initial Registers: ";
-    for (size_t i = 0; i < cpu.registers.size(); ++i) {
-        std::cout << "R" << i << "=0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(cpu.registers[i]) << " ";
-    }
-    std::cout << std::dec << "\nPC=0x" << std::hex << cpu.pc << std::dec << "\n";
+    std::cout << "Starting simulation..." << std::endl;
+    sim.run();
 
-    cpu.reset();  // PC=0
-    uint32_t cycles = 0;
-    while (cycles < 30) {  // Run until program end
-        cpu.execute_cycle();
-        ++cycles;
-        if (mem.read_byte(cpu.pc) == 0xF4) break;  // Simulated halt
-    }
-
-    std::cout << "After Execution:\n";
-    std::cout << "Registers: ";
-    for (size_t i = 0; i < cpu.registers.size(); ++i) {
-        std::cout << "R" << i << "=0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(cpu.registers[i]) << " ";
-    }
-    std::cout << std::dec << "\n";
-    std::cout << "Memory[0x10]: 0x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(mem.read_byte(0x10)) << std::dec << "\n";
-    std::cout << "Flags: ZF=" << cpu.zf << " CF=" << cpu.cf << "\n";
-    std::cout << "PC=0x" << std::hex << cpu.pc << std::dec << "\n";
-    std::cout << "Simulation complete. Total cycles: " << cycles << "\n";
+    std::cout << "Simulation halted." << std::endl;
+    std::cout << "EAX = " << std::hex << std::setw(8) << std::setfill('0') << sim.get_reg(0) << std::endl;
+    // Expected: 8 (0x00000008)
 
     return 0;
 }
