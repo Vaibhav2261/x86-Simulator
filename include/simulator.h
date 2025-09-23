@@ -1,0 +1,1 @@
+./simulator  # Executes hardcoded program and prints state
