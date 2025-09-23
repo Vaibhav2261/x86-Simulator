@@ -1,5 +1,6 @@
 #include "memory.h"
-#include <cstring>
+#include <cstring>  // For std::memcpy
+
 Memory::Memory() : mem(SIZE, 0) {}  // Initialize to zeros
 
 Memory::~Memory() {}
@@ -17,7 +18,7 @@ uint8_t Memory::read_byte(uint32_t addr) const {
 uint16_t Memory::read_word(uint32_t addr) const {
     check_bounds(addr, 2);
     return (static_cast<uint16_t>(mem[addr + 1]) << 8) | mem[addr];  // Little-endian
-    }
+}
 
 uint32_t Memory::read_dword(uint32_t addr) const {
     check_bounds(addr, 4);
