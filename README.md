@@ -1,21 +1,49 @@
-# Simple x86 Instruction Set Simulator
+# x86 Assembly Simulator
 
-A lightweight C++ simulator for a subset of the x86 instruction set, focusing on the fetch-decode-execute cycle. This project demonstrates computer architecture fundamentals, including register management, memory access, and basic instruction emulation. 
+A comprehensive x86 instruction set simulator built with React and C++. This project provides both a web-based interactive simulator and a standalone C++ implementation.
+
 ## Features
-- **Supported Instructions**: NOP (0x90), MOV reg-reg (0x88), ADD reg-reg (0x00), SUB reg-reg (0x28), JMP rel8 (0xEB).
-- **Architecture**: 8-bit registers (AX, BX, CX, DX, SI, DI, BP, SP), 256-byte RAM, flags (ZF, CF).
-- **Execution Model**: Cycle-accurate simulation with little-endian byte order.
-- **Build System**: CMake + Google Test for tests.
-- **Use Case**: Simulates a simple program (e.g., load values, add, store to memory, jump).
 
-## Building and Running
-### Prerequisites
-- C++17 compiler (g++ 7+)
-- CMake 3.10+
-- Google Test (install: `sudo apt install libgtest-dev` on Ubuntu)
+### Web Simulator
+-  **Complete x86 ISA Support**: 40+ instructions including arithmetic, logic, control flow, and stack operations
+-  **Real-time Visualization**: Live register states, CPU flags, and memory view
+-  **Interactive Editor**: Syntax highlighting, code examples, and file import/export
+-  **Instant Execution**: Run assembly programs directly in your browser
+-  **Responsive Design**: Works on desktop, tablet, and mobile devices
 
-### Build
+### C++ Simulator
+-  **High Performance**: Native C++ implementation for maximum speed
+-  **1MB Memory**: Full memory simulation with stack operations
+-  **Extended Instructions**: Support for interrupts, system calls, and more
+-  **File Input**: Load and execute .asm files
+
+## Supported Instructions
+
+### Data Transfer
+- MOV, PUSH, POP
+
+### Arithmetic
+- ADD, SUB, INC, DEC, MUL, IMUL, DIV, NEG
+
+### Logic & Bitwise
+- AND, OR, XOR, NOT, TEST
+
+### Shift & Rotate
+- SHL, SHR, SAR, ROL, ROR
+
+### Control Flow
+- JMP, JE/JZ, JNE/JNZ, JG, JGE, JL, JLE, JA, JAE, JB, JBE, JS, JNS
+- CALL, RET
+
+### Special
+- CMP, NOP, HLT
+- PRINT, PRINTC (custom I/O instructions)
+
+## Quick Start
+
+### Web Version (Vercel Deployment)
+
+1. Clone the repository:
 ```bash
-mkdir build && cd build
-cmake ..
-make
+git clone https://github.com/yourusername/x86-simulator.git
+cd x86-simulator
